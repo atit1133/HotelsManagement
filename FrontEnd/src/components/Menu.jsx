@@ -19,7 +19,16 @@ const Menu = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/staffs">Staff</NavLink>
+            <NavLink
+              to="/staffs"
+              style={({ isActive }) => {
+                return isActive
+                  ? { fontSize: "20px", fontWeight: "bolder" }
+                  : {};
+              }}
+            >
+              Staff
+            </NavLink>
           </li>
           <li>
             <NavLink to="/staffs">Dashboard</NavLink>

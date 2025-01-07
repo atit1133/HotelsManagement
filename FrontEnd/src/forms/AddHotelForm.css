@@ -1,0 +1,55 @@
+/* AddHotelForm.css */
+.form-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+}
+.close-dialog {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+.form-container h3 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.input-field {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 1em;
+}
+
+.input-field:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.submit-button {
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #2980b9;
+}

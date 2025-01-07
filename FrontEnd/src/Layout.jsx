@@ -1,6 +1,6 @@
-import React from "react";
 import Header from "./components/Header";
 import Menu from "./components/Menu";
+import PropTypes from "prop-types";
 
 const Layout = ({ children }) => {
   return (
@@ -12,6 +12,10 @@ const Layout = ({ children }) => {
       </div>
     </div>
   );
+};
+
+Layout.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default Layout;

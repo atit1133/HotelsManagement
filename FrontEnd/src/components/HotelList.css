@@ -1,7 +1,7 @@
 /* HotelList.css */
 .hotel-list-container {
   margin: 20px;
-  font-family: Arial, sans-serif;
+  /* font-family: Arial, sans-serif; */
 }
 
 .title {
@@ -14,6 +14,7 @@
   background-color: #3498db;
   color: white;
   border: none;
+  border-radius: 5px;
   padding: 10px 20px;
   font-size: 1em;
   cursor: pointer;
@@ -39,4 +40,53 @@
 .hotel-table th {
   background-color: #f2f2f2;
   color: black;
+}
+.rooms-table {
+  width: 70%;
+  border-collapse: collapse;
+}
+
+.rooms-table th,
+.rooms-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.rooms-table th {
+  background-color: #f2f2f2;
+  color: black;
+}
+
+.full-page-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5); /* Adds a backdrop */
+}
+.full-page-dialog > form {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
