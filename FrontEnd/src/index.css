@@ -139,3 +139,13 @@ header h1 {
 .login-button:hover {
   background-color: #f4f4f4;
 }
+
+.label-date-of-birth {
+  align-self: start;
+  margin-bottom: -20px;
+  z-index: 1;
+  background-color: white;
+  padding: 0 5px;
+  border-radius: 10px;
+  font-size: 12px;
+}

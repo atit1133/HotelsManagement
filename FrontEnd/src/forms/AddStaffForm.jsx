@@ -39,6 +39,11 @@ const AddStaffForm = () => {
       <button onClick={handleDialog} className="submit-button">
         Add Staff
       </button>
+      <select name="hotel_id" id="hotel_id" className="hotel-select">
+        <option value="Hotel 1">Hotel 1</option>
+        <option value="Hotel 2">Hotel 1</option>
+        <option value="Hotel 3">Hotel 1</option>
+      </select>
 
       {isDialogOpen && (
         <dialog open className="full-page-dialog">

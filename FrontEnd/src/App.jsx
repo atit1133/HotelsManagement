@@ -2,6 +2,9 @@ import Layout from "./Layout";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Hotels from "./pages/Hotels";
 import Staffs from "./pages/Staffs";
+import Guest from "./pages/Guest";
+import Booking from "./pages/Booking";
+import Checkin from "./pages/Checkin";
 
 const App = () => {
   return (
@@ -22,6 +25,9 @@ const App = () => {
           />
           <Route path="/hotels" element={<Hotels />} />
           <Route path="/staffs" element={<Staffs />} />
+          <Route path="/guest" element={<Guest />} />
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/checkin" element={<Checkin />} />
         </Routes>
       </Layout>
     </Router>

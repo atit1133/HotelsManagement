@@ -37,16 +37,43 @@ const Menu = () => {
         <h3 className="roboto-medium">Reservation Operations</h3>
         <ul>
           <li>
-            <NavLink to="/staffs">Check-in</NavLink>
+            <NavLink
+              to="/checkin"
+              style={({ isActive }) => {
+                return isActive
+                  ? { fontSize: "20px", fontWeight: "bolder" }
+                  : {};
+              }}
+            >
+              Check-in
+            </NavLink>
           </li>
           <li>
             <NavLink to="/staffs">Check-out</NavLink>
           </li>
           <li>
-            <NavLink to="/staffs">Guest</NavLink>
+            <NavLink
+              to="/guest"
+              style={({ isActive }) => {
+                return isActive
+                  ? { fontSize: "20px", fontWeight: "bolder" }
+                  : {};
+              }}
+            >
+              Guest
+            </NavLink>
           </li>
           <li>
-            <NavLink to="/staffs">Booking</NavLink>
+            <NavLink
+              to="/booking"
+              style={({ isActive }) => {
+                return isActive
+                  ? { fontSize: "20px", fontWeight: "bolder" }
+                  : {};
+              }}
+            >
+              Booking
+            </NavLink>
           </li>
         </ul>
       </nav>
