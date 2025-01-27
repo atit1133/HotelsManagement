@@ -1,14 +1,14 @@
-const express = require('express')
-const app = express()
+const express = require("express");
+const app = express();
 
-const port = 3002
+const port = 3002;
 
-app.use(express.json())
+app.use(express.json());
 
-app.get('/',(req,res)=>{
-    res.send('Hello from backend')
-})
+const hotelRoutes = require("./routes/hotels");
 
-app.listen(port,()=>{
-    console.log('server is running on port ',port)
-})
+app.use("/api/hotels", hotelRoutes);
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
