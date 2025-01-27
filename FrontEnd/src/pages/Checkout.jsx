@@ -4,25 +4,15 @@ import PromptPayQR from "../components/ModalPayment";
 
 const Checkout = () => {
   const [dataForm, setDataForm] = useState("");
-  const [payment, setPayment] = useState(false);
   const [openDia, setOpenDia] = useState(false);
 
   const openDialog = () => {
     setOpenDia(!openDia);
-    console.log(openDia);
   };
-
   function checkoutRoom(data) {
     return setDataForm((prev) => [...prev, data]);
   }
-  // function showModal() {
-  //   return () => {
-  //     setPayment(true);
-  //     setOpenDia(true);
-  //     console.log(payment);
-  //     console.log(openDia);
-  //   };
-  // }
+
   return (
     <>
       <div>
@@ -74,8 +64,6 @@ const Checkout = () => {
         <button className="submit-button" onClick={() => openDialog()}>
           Payment
         </button>
-        {/* {openDia && <ModalPayment />} */}
-        {openDia && <h1>Test Modal</h1>}
         {openDia && <PromptPayQR openDia={openDia} openDialog={openDialog} />}
       </div>
       {dataForm.length > 0 && (
