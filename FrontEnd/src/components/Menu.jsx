@@ -38,21 +38,6 @@ const Menu = () => {
         <ul>
           <li>
             <NavLink
-              to="/checkin"
-              style={({ isActive }) => {
-                return isActive
-                  ? { fontSize: "20px", fontWeight: "bolder" }
-                  : {};
-              }}
-            >
-              Check-in
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/staffs">Check-out</NavLink>
-          </li>
-          <li>
-            <NavLink
               to="/guest"
               style={({ isActive }) => {
                 return isActive
@@ -74,6 +59,47 @@ const Menu = () => {
             >
               Booking
             </NavLink>
+            <ul>
+              <li>
+                <NavLink
+                  to="/booking/check-in"
+                  style={({ isActive }) => {
+                    return isActive
+                      ? { fontSize: "18px", fontWeight: "bold" }
+                      : {};
+                  }}
+                >
+                  {" "}
+                  Check-in{" "}
+                </NavLink>{" "}
+              </li>
+              <li>
+                <NavLink
+                  to="/booking/check-out"
+                  style={({ isActive }) => {
+                    return isActive
+                      ? { fontSize: "18px", fontWeight: "bold" }
+                      : {};
+                  }}
+                >
+                  {" "}
+                  Check-out{" "}
+                </NavLink>{" "}
+              </li>
+              <li>
+                <NavLink
+                  to="/booking/comfirmed"
+                  style={({ isActive }) => {
+                    return isActive
+                      ? { fontSize: "18px", fontWeight: "bold" }
+                      : {};
+                  }}
+                >
+                  {" "}
+                  Confirmed{" "}
+                </NavLink>{" "}
+              </li>
+            </ul>
           </li>
         </ul>
       </nav>

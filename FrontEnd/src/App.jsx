@@ -5,6 +5,7 @@ import Staffs from "./pages/Staffs";
 import Guest from "./pages/Guest";
 import Booking from "./pages/Booking";
 import Checkin from "./pages/Checkin";
+import Checkout from "./pages/Checkout";
 
 const App = () => {
   return (
@@ -27,7 +28,8 @@ const App = () => {
           <Route path="/staffs" element={<Staffs />} />
           <Route path="/guest" element={<Guest />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/checkin" element={<Checkin />} />
+          <Route path="/booking/check-in" element={<Checkin />} />
+          <Route path="/booking/check-out" element={<Checkout />} />
         </Routes>
       </Layout>
     </Router>

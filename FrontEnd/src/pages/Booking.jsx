@@ -2,7 +2,7 @@ import AddBookingForm from "../forms/AddBookingForm";
 const Booking = () => {
   return (
     <div>
-      <AddBookingForm />
+      <AddBookingForm actions="booking" />
     </div>
   );
 };
