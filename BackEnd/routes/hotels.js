@@ -1,33 +1,35 @@
 const express = require("express");
 const router = express.Router();
-const mysql = require("mysql2");
-
-// Create a connection to the database
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "password",
-  database: "hotel_management",
-});
-
-// Connect to the database
-db.connect((err) => {
-  if (err) {
-    console.error("Error connecting to the database:", err);
-    return;
-  }
-  console.log("Connected to the database");
-});
+const pool = require("./conn");
 
 // Create a new hotel
 router.post("/", (req, res) => {
   const { name, location, rating } = req.body;
   const query = "INSERT INTO hotels (name, location, rating) VALUES (?, ?, ?)";
-  db.query(query, [name, location, rating], (err, result) => {
+
+  //Get a connection from the pool
+  pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);
     }
-    res.status(201).send("Hotel created successfully");
+    connection.query(query, [name, location, rating], (err, result) => {
+      connection.release();
+      res.status(201).send("Hotel created successfully");
+    });
+  });
+});
+
+//Read all Hotels
+router.get("/", (req, res) => {
+  const query = "SELECT * FROM hotel";
+  pool.getConnection((err, connection) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    connection.query(query, (err, result) => {
+      connection.release();
+      res.status(200).json(result);
+    });
   });
 });
 

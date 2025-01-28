@@ -1,5 +1,5 @@
 -- Create the hotel table
-CREATE TABLE `hotel_management`.`hotel` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`hotel` (
     `hotel_id` INT NOT NULL AUTO_INCREMENT,
     `hotel_name` VARCHAR(255) NOT NULL,
     `hotel_address` VARCHAR(255) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE `hotel_management`.`hotel` (
 ) ENGINE = InnoDB;
 
 -- Create the staff table
-CREATE TABLE `hotel_management`.`staff` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`staff` (
     `staff_id` INT NOT NULL AUTO_INCREMENT,
     `staff_name` VARCHAR(255) NOT NULL,
     `staff_lastname` VARCHAR(255) NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE `hotel_management`.`staff` (
 ) ENGINE = InnoDB;
 
 -- Create the room table
-CREATE TABLE `hotel_management`.`room` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`room` (
     `room_id` INT NOT NULL AUTO_INCREMENT,
     `hotel_id` INT NOT NULL,
     `type_id` INT NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE `hotel_management`.`room` (
 ) ENGINE = InnoDB;
 
 -- Create the room_type table
-CREATE TABLE `hotel_management`.`room_type` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`room_type` (
     `type_id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50) NOT NULL,
     `descriptions` VARCHAR(255) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `hotel_management`.`room_type` (
 ) ENGINE = InnoDB;
 
 -- Create the guest table
-CREATE TABLE `hotel_management`.`guest` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`guest` (
     `guest_id` INT NOT NULL AUTO_INCREMENT,
     `first_name` VARCHAR(50) NOT NULL,
     `last_name` VARCHAR(50) NOT NULL,
@@ -59,19 +59,8 @@ CREATE TABLE `hotel_management`.`guest` (
     PRIMARY KEY (`guest_id`)
 ) ENGINE = InnoDB;
 
--- Create the payment table
-CREATE TABLE `hotel_management`.`payment` (
-    `payment_id` INT NOT NULL AUTO_INCREMENT,
-    `booking_id` INT NOT NULL,
-    `amount` DECIMAL(10, 2) NOT NULL,
-    `payment_date` DATE NOT NULL,
-    `payment_method` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`payment_id`),
-    FOREIGN KEY (`booking_id`) REFERENCES `booking`(`booking_id`)
-) ENGINE = InnoDB;
-
 -- Create the booking table
-CREATE TABLE `hotel_management`.`booking` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`booking` (
     `booking_id` INT NOT NULL AUTO_INCREMENT,
     `guest_id` INT NOT NULL,
     `room_number` INT NOT NULL,
@@ -83,8 +72,30 @@ CREATE TABLE `hotel_management`.`booking` (
     FOREIGN KEY (`room_number`) REFERENCES `room`(`room_id`)
 ) ENGINE = InnoDB;
 
+-- Create the payment table
+CREATE TABLE IF NOT EXISTS `hotel_management`.`payment` (
+    `payment_id` INT NOT NULL AUTO_INCREMENT,
+    `booking_id` INT NOT NULL,
+    `amount` DECIMAL(10, 2) NOT NULL,
+    `payment_date` DATE NOT NULL,
+    `payment_method` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`payment_id`),
+    FOREIGN KEY (`booking_id`) REFERENCES `booking`(`booking_id`)
+) ENGINE = InnoDB;
+
 -- Create the user_activity table
-CREATE TABLE `hotel_management`.`user_activity` (
+-- Create the users table
+CREATE TABLE IF NOT EXISTS `hotel_management`.`users` (
+    `user_id` INT NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(50) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `role` VARCHAR(50) NOT NULL,
+    PRIMARY KEY (`user_id`)
+) ENGINE = InnoDB;
+
+-- Create the user_activity table
+CREATE TABLE IF NOT EXISTS `hotel_management`.`user_activity` (
     `activity_id` INT NOT NULL AUTO_INCREMENT,
     `user_id` INT NOT NULL,
     `activity_type` VARCHAR(50) NOT NULL,
@@ -93,8 +104,9 @@ CREATE TABLE `hotel_management`.`user_activity` (
     FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`)
 ) ENGINE = InnoDB;
 
+
 -- Create the system_metrics table
-CREATE TABLE `hotel_management`.`system_metrics` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`system_metrics` (
     `metric_id` INT NOT NULL AUTO_INCREMENT,
     `metric_name` VARCHAR(50) NOT NULL,
     `metric_value` DECIMAL(10, 2) NOT NULL,
@@ -103,7 +115,7 @@ CREATE TABLE `hotel_management`.`system_metrics` (
 ) ENGINE = InnoDB;
 
 -- Create the error_logs table
-CREATE TABLE `hotel_management`.`error_logs` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`error_logs` (
     `error_id` INT NOT NULL AUTO_INCREMENT,
     `error_message` TEXT NOT NULL,
     `error_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -111,7 +123,7 @@ CREATE TABLE `hotel_management`.`error_logs` (
 ) ENGINE = InnoDB;
 
 -- Create the sales_data table
-CREATE TABLE `hotel_management`.`sales_data` (
+CREATE TABLE IF NOT EXISTS `hotel_management`.`sales_data` (
     `sale_id` INT NOT NULL AUTO_INCREMENT,
     `room_id` INT NOT NULL,
     `quantity` INT NOT NULL,
