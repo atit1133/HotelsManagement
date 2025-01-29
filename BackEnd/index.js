@@ -6,8 +6,10 @@ const port = 3002;
 app.use(express.json());
 
 const hotelRoutes = require("./routes/hotels");
+const roomRoutes = require("./routes/rooms");
 
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/rooms", roomRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
