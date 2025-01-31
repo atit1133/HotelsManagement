@@ -3,7 +3,7 @@ import { useState } from "react";
 import "./AddHotelForm.css";
 // import axios from "axios";
 
-const AddHotelForm = ({ btnClose }) => {
+const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
   const [hotel, setHotel] = useState({
     hotel_name: "",
     hotel_address: "",
@@ -19,8 +19,26 @@ const AddHotelForm = ({ btnClose }) => {
     setHotel({ ...hotel, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3002/api/hotels", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(hotel),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      btnClose();
+      onSubmitSuccess();
+    } catch (error) {
+      console.log("Error saving data", error);
+    }
+
     // axios
     //   .post("http://localhost:3001/hotels", hotel)
     //   .then((response) => console.log(response))

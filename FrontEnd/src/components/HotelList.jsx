@@ -10,8 +10,8 @@ const HotelList = () => {
     room: false,
     roomType: false,
   });
-  const [expandedHotelId, setExpandedHotelId] = useState(null);
   const [dataHotel, setDataHotel] = useState(null);
+  const [dataRoomType, setDataRoomType] = useState(null);
   const fetchDataHotel = async () => {
     try {
       const response = await fetch("http://localhost:3002/api/hotels");
@@ -26,9 +26,27 @@ const HotelList = () => {
     }
   };
 
+  const fetchDataRoomType = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3002/api/roomtype/${id}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setDataRoomType(data);
+      return data;
+    } catch (error) {
+      return setDataRoomType({ error: error.message });
+    }
+  };
+
   useEffect(() => {
     fetchDataHotel();
   }, []);
+
+  const refreshHotelData = () => {
+    fetchDataHotel();
+  };
 
   // const hotels = [
   //   {
@@ -86,6 +104,10 @@ const HotelList = () => {
   };
 
   const handleClickTable = (id) => {
+    fetchDataRoomType(id);
+  };
+
+  const handleClickEdit = (id) => {
     setDataEditID(id);
   };
 
@@ -100,16 +122,6 @@ const HotelList = () => {
       >
         Register New Hotel
       </button>
-      {showDialog.hotel && (
-        <div
-          className="dialog-backdrop"
-          onClick={() => handleCloseDialog("hotel")}
-        >
-          <dialog open className="full-page-dialog">
-            <AddHotelForm btnClose={() => handleCloseDialog("hotel")} />
-          </dialog>
-        </div>
-      )}
       <table className="hotel-table">
         <thead>
           <tr>
@@ -118,7 +130,7 @@ const HotelList = () => {
             <th>Address</th>
             <th>Phone</th>
             <th>Email</th>
-            <th>Stars</th>
+            <th style={{ width: "2px" }}>Stars</th>
             <th>Checkin</th>
             <th>Checkout</th>
             <th>Actions</th>
@@ -190,7 +202,13 @@ const HotelList = () => {
                     )}
                   </td>
                   <td>
-                    <button>Edit</button>
+                    {isEditing ? (
+                      <button>Save</button>
+                    ) : (
+                      <button onClick={() => handleClickEdit(hotel.hotel_id)}>
+                        Edit
+                      </button>
+                    )}
                     <button>Delete</button>
                   </td>
                 </tr>
@@ -205,69 +223,78 @@ const HotelList = () => {
           )}
         </tbody>
       </table>
-      {expandedHotelId !== null &&
-        hotels.find((hotel) => hotel.id === expandedHotelId) && (
-          <div className="hotel-rooms">
-            <h2>Rooms Inventory</h2>
-            <button
-              className="add-hotel-button"
-              onClick={() => handleAddHotel("room")}
-            >
-              Add Room Details
-            </button>
-            <button
-              onClick={() => handleAddHotel("roomType")}
-              className="add-hotel-button"
-              style={{ marginLeft: "6px" }}
-            >
-              Add Room Types
-            </button>
-            {showDialog.room && (
-              <div
-                className="dialog-backdrop"
-                onClick={() => handleCloseDialog("room")}
-              >
-                <dialog open className="full-page-dialog">
-                  <AddRoomForm btnClose={() => handleCloseDialog("room")} />
-                </dialog>
-              </div>
-            )}
-            {showDialog.roomType && (
-              <div
-                className="dialog-backdrop"
-                onClick={() => handleCloseDialog("roomType")}
-              >
-                <dialog open className="full-page-dialog">
-                  <AddRoomTypeForm
-                    btnClose={() => handleCloseDialog("roomType")}
-                  />
-                </dialog>
-              </div>
-            )}
-            <table className="rooms-table">
-              <thead>
-                <tr>
-                  <th>Room Name</th>
-                  <th>Type ID</th>
-                  <th>Capacity</th>
-                  <th>Price Per Night</th>
-                </tr>
-              </thead>
-              <tbody>
-                {hotels
-                  .find((hotel) => hotel.id === expandedHotelId)
-                  .rooms.map((room, index) => (
-                    <tr key={index}>
-                      <td>{room.name}</td>
-                      <td>{room.typeId}</td>
-                      <td>{room.capacity}</td>
-                      <td>{room.price}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+      <div className="hotel-rooms">
+        <h2>Rooms Inventory</h2>
+        <button
+          className="add-hotel-button"
+          onClick={() => handleAddHotel("room")}
+        >
+          Add Room Details
+        </button>
+        <button
+          onClick={() => handleAddHotel("roomType")}
+          className="add-hotel-button"
+          style={{ marginLeft: "6px" }}
+        >
+          Add Room Types
+        </button>
+        {showDialog.hotel && (
+          <div
+            className="dialog-backdrop"
+            onClick={() => handleCloseDialog("hotel")}
+          >
+            <dialog open className="full-page-dialog">
+              <AddHotelForm
+                btnClose={() => handleCloseDialog("hotel")}
+                onSubmitSuccess={refreshHotelData}
+              />
+            </dialog>
           </div>
         )}
+        {showDialog.room && (
+          <div
+            className="dialog-backdrop"
+            onClick={() => handleCloseDialog("room")}
+          >
+            <dialog open className="full-page-dialog">
+              <AddRoomForm btnClose={() => handleCloseDialog("room")} />
+            </dialog>
+          </div>
+        )}
+
+        {showDialog.roomType && (
+          <div
+            className="dialog-backdrop"
+            onClick={() => handleCloseDialog("roomType")}
+          >
+            <dialog open className="full-page-dialog">
+              <AddRoomTypeForm btnClose={() => handleCloseDialog("roomType")} />
+            </dialog>
+          </div>
+        )}
+        <table className="rooms-table">
+          <thead>
+            <tr>
+              <th>Room Name</th>
+              <th>Type ID</th>
+              <th>Capacity</th>
+              <th>Price Per Night</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dataRoomType !== null &&
+              dataRoomType.length > 0 &&
+              dataRoomType.map((room, index) => (
+                <tr key={index}>
+                  <td>{room.name}</td>
+                  <td>{room.typeId}</td>
+                  <td>{room.capacity}</td>
+                  <td>{room.price_per_night}</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
