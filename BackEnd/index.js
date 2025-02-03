@@ -10,7 +10,7 @@ app.use(cors());
 
 const hotelRoutes = require("./routes/hotels");
 const roomRoutes = require("./routes/rooms");
-const roomType = require("./routes/roomType");
+const roomType = require("./routes/roomtype");
 const booking = require("./routes/booking");
 
 app.use("/api/hotels", hotelRoutes);

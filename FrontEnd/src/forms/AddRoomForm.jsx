@@ -1,32 +1,82 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 // import axios from "axios";
 import "./AddRoomForm.css";
 
-const AddRoomForm = ({ btnClose }) => {
+// eslint-disable-next-line react/prop-types
+const AddRoomForm = ({ btnClose, currentHotel }) => {
   const [room, setRoom] = useState({
     hotel_id: "",
     type_id: "",
     status: "",
   });
+  const [dataRoomType, setDataRoomType] = useState(null);
+  const [dataRoom, setDataRoom] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setRoom({ ...room, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // axios
-    //   .post("http://localhost:3001/rooms", room)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
+    const updateRoom = { ...room, hotel_id: currentHotel };
+
+    try {
+      await fetch("http://localhost:3002/api/rooms/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateRoom),
+      }).then(() => {
+        console.log("Your data collect :", updateRoom);
+        console.log("New room added");
+        fetchDataRoom(currentHotel);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    btnClose();
   };
 
   const handleFormClick = (e) => {
     e.stopPropagation();
-    // Stop the click event from propagating to the backdrop e.stopPropagation();
   };
+
+  const fetchDataRoomType = async () => {
+    const url = `http://localhost:3002/api/roomtype/all`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setDataRoomType(data);
+      return data;
+    } catch (error) {
+      return setDataRoomType({ error: error.message });
+    }
+  };
+  const fetchDataRoom = async () => {
+    const url = `http://localhost:3002/api/rooms/${currentHotel}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setDataRoom(data);
+      return data;
+    } catch (error) {
+      return setDataRoom({ error: error.message });
+    }
+  };
+
+  useEffect(() => {
+    fetchDataRoomType();
+    fetchDataRoom();
+  }, []);
 
   return (
     <div className="add-room-container">
@@ -41,25 +91,49 @@ const AddRoomForm = ({ btnClose }) => {
           name="hotel_id"
           className="form-input"
           placeholder="Hotel ID"
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="type_id"
-          className="form-input"
-          placeholder="Room Type ID"
-          onChange={handleChange}
+          defaultValue={currentHotel}
+          readOnly
           required
         />
         <input
           type="text"
-          name="status"
+          name="room_no"
           className="form-input"
-          placeholder="Status"
+          placeholder="Room Number"
           onChange={handleChange}
           required
         />
+        <select
+          name="type_id"
+          className="form-input"
+          onChange={handleChange}
+          value={room.type_id}
+          required
+        >
+          <option value="" disabled>
+            Select Room Type
+          </option>
+          {dataRoomType &&
+            dataRoomType.map((roomType) => (
+              <option key={roomType.id} value={roomType.type_id} required>
+                {roomType.name}
+              </option>
+            ))}
+        </select>
+        <select
+          name="status"
+          className="form-input"
+          onChange={handleChange}
+          value={room.status}
+          defaultValue={"Select Status"}
+          required
+        >
+          <option value="" disabled>
+            Select Status
+          </option>
+          <option value="active">active</option>
+          <option value="inactive">inactive</option>
+        </select>
         <button type="submit" className="form-button">
           Add Room
         </button>
@@ -75,9 +149,16 @@ const AddRoomForm = ({ btnClose }) => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td> <td>Deluxe</td> <td>Useable</td> <td>Modify / Delete</td>
-          </tr>
+          {dataRoom !== null &&
+            dataRoom.length > 0 &&
+            dataRoom.map((roomData, index) => (
+              <tr key={index}>
+                <td>{roomData.room_no}</td>
+                <td>{roomData.room_type}</td>
+                <td>{roomData.status}</td>
+                <td>Delete</td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

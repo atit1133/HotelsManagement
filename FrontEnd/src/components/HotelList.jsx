@@ -11,6 +11,7 @@ const HotelList = () => {
     roomType: false,
   });
   const [dataHotel, setDataHotel] = useState(null);
+  const [currentHotel, setCurrentHotel] = useState(null);
   const [dataRoomType, setDataRoomType] = useState(null);
   const fetchDataHotel = async () => {
     try {
@@ -27,8 +28,10 @@ const HotelList = () => {
   };
 
   const fetchDataRoomType = async (id) => {
+    const url = `http://localhost:3002/api/roomtype/${id}`;
+    console.log(url);
     try {
-      const response = await fetch(`http://localhost:3002/api/roomtype/${id}`);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -48,53 +51,7 @@ const HotelList = () => {
     fetchDataHotel();
   };
 
-  // const hotels = [
-  //   {
-  //     id: 1,
-  //     name: "Hotel California",
-  //     address: "424 E. Palm Canyon Dr, Los Angeles, CA",
-  //     phone: "123-456-7890",
-  //     email: "contact@hotelcalifornia.com",
-  //     stars: 5,
-  //     checkin: "3:00 PM",
-  //     checkout: "11:00 AM",
-  //     rooms: [
-  //       { name: "Deluxe", typeId: 101, capacity: 2, price: 150 },
-  //       { name: "Suite", typeId: 102, capacity: 4, price: 300 },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "The Grand Budapest Hotel",
-  //     address: "Alpenstrasse 10, Zubrowka",
-  //     phone: "987-654-3210",
-  //     email: "info@grandbudapest.com",
-  //     stars: 4,
-  //     checkin: "2:00 PM",
-  //     checkout: "10:00 AM",
-  //     rooms: [
-  //       { name: "Standard", typeId: 201, capacity: 2, price: 100 },
-  //       { name: "Luxury Suite", typeId: 202, capacity: 5, price: 400 },
-  //     ],
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "The Overlook Hotel",
-  //     address: "Sidewinder, Colorado",
-  //     phone: "555-123-4567",
-  //     email: "reservation@overlookhotel.com",
-  //     stars: 5,
-  //     checkin: "4:00 PM",
-  //     checkout: "12:00 PM",
-  //     rooms: [
-  //       { name: "King Room", typeId: 301, capacity: 2, price: 200 },
-  //       { name: "Presidential Suite", typeId: 302, capacity: 6, price: 500 },
-  //     ],
-  //   },
-  // ];
-
   const hotels = dataHotel;
-  console.log(hotels);
   const handleCloseDialog = (dialogName) => {
     setShowDialog((prevState) => ({ ...prevState, [dialogName]: false }));
   };
@@ -105,6 +62,8 @@ const HotelList = () => {
 
   const handleClickTable = (id) => {
     fetchDataRoomType(id);
+    setCurrentHotel(id);
+    console.log(currentHotel);
   };
 
   const handleClickEdit = (id) => {
@@ -234,7 +193,12 @@ const HotelList = () => {
         <button
           onClick={() => handleAddHotel("roomType")}
           className="add-hotel-button"
-          style={{ marginLeft: "6px" }}
+          style={
+            currentHotel == null
+              ? { cursor: "not-allowed", marginLeft: "6px" }
+              : { marginLeft: "6px" }
+          }
+          disabled={currentHotel == null}
         >
           Add Room Types
         </button>
@@ -257,7 +221,10 @@ const HotelList = () => {
             onClick={() => handleCloseDialog("room")}
           >
             <dialog open className="full-page-dialog">
-              <AddRoomForm btnClose={() => handleCloseDialog("room")} />
+              <AddRoomForm
+                btnClose={() => handleCloseDialog("room")}
+                currentHotel={currentHotel}
+              />
             </dialog>
           </div>
         )}
@@ -268,28 +235,37 @@ const HotelList = () => {
             onClick={() => handleCloseDialog("roomType")}
           >
             <dialog open className="full-page-dialog">
-              <AddRoomTypeForm btnClose={() => handleCloseDialog("roomType")} />
+              <AddRoomTypeForm
+                btnClose={() => handleCloseDialog("roomType")}
+                currentHotel={currentHotel}
+                fetchDataRoomType={fetchDataRoomType}
+              />
             </dialog>
           </div>
         )}
         <table className="rooms-table">
           <thead>
             <tr>
-              <th>Room Name</th>
-              <th>Type ID</th>
+              <th>Type Room</th>
+              <th>Descriptions</th>
               <th>Capacity</th>
               <th>Price Per Night</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {dataRoomType !== null &&
+              currentHotel !== null &&
               dataRoomType.length > 0 &&
               dataRoomType.map((room, index) => (
                 <tr key={index}>
                   <td>{room.name}</td>
-                  <td>{room.typeId}</td>
+                  <td>{room.descriptions}</td>
                   <td>{room.capacity}</td>
                   <td>{room.price_per_night}</td>
+                  <td>
+                    <button>Delete</button>
+                  </td>
                 </tr>
               ))}
           </tbody>

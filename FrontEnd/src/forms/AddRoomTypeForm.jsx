@@ -3,7 +3,8 @@ import "./AddRoomTypeForm.css";
 import PropTypes from "prop-types";
 // import axios from "axios";
 
-const AddRoomTypeForm = ({ btnClose }) => {
+// eslint-disable-next-line react/prop-types
+const AddRoomTypeForm = ({ btnClose, currentHotel, fetchDataRoomType }) => {
   const [roomType, setRoomType] = useState({
     name: "",
     descriptions: "",
@@ -18,10 +19,25 @@ const AddRoomTypeForm = ({ btnClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // axios
-    //   .post("http://localhost:3001/room_types", roomType)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
+    if (currentHotel === null) {
+      fetchDataRoomType();
+    } else {
+      try {
+        fetch("http://localhost:3002/api/roomtype", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(roomType),
+        }).then(() => {
+          console.log("New room type added");
+          fetchDataRoomType();
+          btnClose();
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
   };
 
   const handleFormClick = (e) => {

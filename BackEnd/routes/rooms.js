@@ -5,6 +5,7 @@ const pool = require("./conn");
 // Create a new room
 router.post("/", (req, res) => {
   const { hotel_id, type_id, status } = req.body;
+  console.log("Received values:", { hotel_id, type_id, status });
   const query = "INSERT INTO room (hotel_id, type_id, status) VALUES (?, ?, ?)";
 
   //Get a connection from the pool
