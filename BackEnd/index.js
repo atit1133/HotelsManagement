@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 
 const port = 3002;
+const host = "192.168.1.116";
 
 app.use(express.json());
 app.use(cors());
@@ -18,5 +19,5 @@ app.use("/api/roomtype", roomType);
 app.use("/api/booking", booking);
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://${host}:${port}`);
 });
