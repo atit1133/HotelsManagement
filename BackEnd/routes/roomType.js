@@ -50,7 +50,7 @@ router.get("/:id", (req, res) => {
   const { id } = req.params;
   console.log("id", id);
   const query =
-    "SELECT room_type.name, room_type.descriptions, room_type.capacity, room_type.price_per_night FROM room INNER JOIN hotel ON room.hotel_id = hotel.hotel_id INNER JOIN room_type ON room.type_id = room_type.type_id WHERE room.hotel_id = ?";
+    "SELECT DISTINCT room_type.name, room_type.descriptions, room_type.capacity, room_type.price_per_night FROM room INNER JOIN hotel ON room.hotel_id = hotel.hotel_id INNER JOIN room_type ON room.type_id = room_type.type_id WHERE room.hotel_id = ?";
   pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);

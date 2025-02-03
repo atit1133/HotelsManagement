@@ -95,3 +95,10 @@
 .data-table tr:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #c0c0c0; /* Optional: Set a background color to match your design */
+  z-index: 1; /* Ensure the header stays on top */
+}

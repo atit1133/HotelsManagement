@@ -141,26 +141,28 @@ const AddRoomForm = ({ btnClose, currentHotel }) => {
           x
         </button>
       </form>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Room No.</th> <th>Room Type</th> <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dataRoom !== null &&
-            dataRoom.length > 0 &&
-            dataRoom.map((roomData, index) => (
-              <tr key={index}>
-                <td>{roomData.room_no}</td>
-                <td>{roomData.room_type}</td>
-                <td>{roomData.status}</td>
-                <td>Delete</td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      <div style={{ overflowX: "auto", height: "300px" }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Room No.</th> <th>Room Type</th> <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dataRoom !== null &&
+              dataRoom.length > 0 &&
+              dataRoom.map((roomData, index) => (
+                <tr key={index}>
+                  <td>{roomData.room_id}</td>
+                  <td>{roomData.name}</td>
+                  <td>{roomData.status}</td>
+                  <td>Delete</td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

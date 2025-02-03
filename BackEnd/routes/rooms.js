@@ -26,7 +26,8 @@ router.post("/", (req, res) => {
 //Read all room by id hotel
 router.get("/:id", (req, res) => {
   const { id } = req.params;
-  const query = "SELECT * FROM room where hotel_id = ?";
+  const query =
+    "SELECT room_type.name, room.status, room.room_id FROM room INNER JOIN hotel ON room.hotel_id = hotel.hotel_id INNER JOIN room_type ON room.type_id = room_type.type_id WHERE hotel.hotel_id = ?";
   pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);
