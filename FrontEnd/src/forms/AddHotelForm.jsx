@@ -2,6 +2,7 @@
 import { useState } from "react";
 import "./AddHotelForm.css";
 // import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
   const [hotel, setHotel] = useState({
@@ -22,7 +23,7 @@ const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3002/api/hotels", {
+      const response = await fetch(`${apiUrl}/api/hotels`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,16 +39,10 @@ const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
     } catch (error) {
       console.log("Error saving data", error);
     }
-
-    // axios
-    //   .post("http://localhost:3001/hotels", hotel)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
   };
 
   const handleFormClick = (e) => {
     e.stopPropagation();
-    // Stop the click event from propagating to the backdrop e.stopPropagation();
   };
 
   return (
@@ -97,6 +92,7 @@ const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
         required
         className="input-field"
       />
+      <label htmlFor="checkout_time">Checkin -Time-</label>
       <input
         type="time"
         name="checkin_time"
@@ -104,6 +100,7 @@ const AddHotelForm = ({ btnClose, onSubmitSuccess }) => {
         required
         className="input-field"
       />
+      <label htmlFor="checkout_time">Checkout -Time-</label>
       <input
         type="time"
         name="checkout_time"

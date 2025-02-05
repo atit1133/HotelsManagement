@@ -5,6 +5,7 @@ import "./AddRoomForm.css";
 
 // eslint-disable-next-line react/prop-types
 const AddRoomForm = ({ btnClose, currentHotel }) => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const [room, setRoom] = useState({
     hotel_id: "",
     type_id: "",
@@ -23,7 +24,7 @@ const AddRoomForm = ({ btnClose, currentHotel }) => {
     const updateRoom = { ...room, hotel_id: currentHotel };
 
     try {
-      await fetch("http://localhost:3002/api/rooms/", {
+      await fetch(`${apiUrl}/api/rooms/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,7 +46,7 @@ const AddRoomForm = ({ btnClose, currentHotel }) => {
   };
 
   const fetchDataRoomType = async () => {
-    const url = `http://localhost:3002/api/roomtype/all`;
+    const url = `${apiUrl}/api/roomtype/all`;
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -59,7 +60,7 @@ const AddRoomForm = ({ btnClose, currentHotel }) => {
     }
   };
   const fetchDataRoom = async () => {
-    const url = `http://localhost:3002/api/rooms/${currentHotel}`;
+    const url = `${apiUrl}/api/rooms/${currentHotel}`;
     try {
       const response = await fetch(url);
       if (!response.ok) {

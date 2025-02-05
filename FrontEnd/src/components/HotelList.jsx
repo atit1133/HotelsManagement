@@ -5,6 +5,7 @@ import AddRoomTypeForm from "../forms/AddRoomTypeForm";
 import { useEffect, useState } from "react";
 
 const HotelList = () => {
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const [showDialog, setShowDialog] = useState({
     hotel: false,
     room: false,
@@ -15,7 +16,7 @@ const HotelList = () => {
   const [dataRoomType, setDataRoomType] = useState(null);
   const fetchDataHotel = async () => {
     try {
-      const response = await fetch("http://localhost:3002/api/hotels");
+      const response = await fetch(`${apiUrl}/api/hotels`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
@@ -28,7 +29,7 @@ const HotelList = () => {
   };
 
   const fetchDataRoomType = async (id) => {
-    const url = `http://localhost:3002/api/roomtype/${id}`;
+    const url = `${apiUrl}/api/roomtype/${id}`;
     console.log(url);
     try {
       const response = await fetch(url);

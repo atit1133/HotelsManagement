@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AddStaffForm.css";
-// import axios from "axios";
+import FormatDate from "../components/FormatDate";
 
 const AddStaffForm = () => {
+  const [listHotel, setListHotel] = useState([]);
+  const [listStaff, setListStaff] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const [staff, setStaff] = useState({
     staff_name: "",
     staff_lastname: "",
@@ -16,6 +19,79 @@ const AddStaffForm = () => {
     hire_date: "",
   });
 
+  const fetchHotel = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/hotels`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      setListHotel(data);
+    } catch (error) {
+      return setListHotel({ error: error.message });
+    }
+  };
+  const fetchStaff = async (id) => {
+    const indicator = id ? id : "";
+
+    try {
+      const response = await fetch(`${apiUrl}/api/staff/${indicator}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.length === 0) {
+        setListStaff([]);
+        console.log("No staff data found.");
+        return [];
+      }
+
+      setListStaff(data);
+      console.log("Staff data:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching staff data:", error);
+      setListStaff({ error: error.message });
+      return { error: error.message };
+    }
+  };
+
+  const fetchStaffByHotel = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/staff`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(staff),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Data:", data);
+      return data;
+    } catch (error) {
+      console.error("Error adding staff:", error);
+      return { error: error.message };
+    }
+  };
+
+  useEffect(() => {
+    fetchHotel();
+  });
+
+  const handleChangeHotel = (e) => {
+    const { value } = e.target;
+    fetchStaff(value);
+    setStaff({ ...staff, hotel_id: value });
+  };
+
   const handleDialog = () => {
     setIsDialogOpen(!isDialogOpen);
   };
@@ -27,10 +103,8 @@ const AddStaffForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // axios
-    //   .post("http://localhost:3001/staff", staff)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
+    setIsDialogOpen(false);
+    fetchStaffByHotel();
   };
 
   return (
@@ -39,101 +113,120 @@ const AddStaffForm = () => {
       <button onClick={handleDialog} className="submit-button">
         Add Staff
       </button>
-      <select name="hotel_id" id="hotel_id" className="hotel-select">
-        <option value="Hotel 1">Hotel 1</option>
-        <option value="Hotel 2">Hotel 1</option>
-        <option value="Hotel 3">Hotel 1</option>
+      <select
+        name="hotel_id"
+        id="hotel_id"
+        className="hotel-select"
+        onChange={handleChangeHotel}
+      >
+        <option value="" disabled>
+          Select Hotel
+        </option>
+        {listHotel.map((hotel) => (
+          <option key={hotel.hotel_id} value={hotel.hotel_id}>
+            {hotel.hotel_name}
+          </option>
+        ))}
       </select>
 
       {isDialogOpen && (
-        <dialog open className="full-page-dialog">
-          <form className="add-staff-form" onSubmit={handleSubmit}>
-            <h3 className="form-title">Add New Staff</h3>
-            <input
-              type="text"
-              name="staff_name"
-              className="form-input"
-              placeholder="First Name"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="staff_lastname"
-              className="form-input"
-              placeholder="Last Name"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="position"
-              className="form-input"
-              placeholder="Position"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="number"
-              name="salary"
-              className="form-input"
-              placeholder="Salary"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="number"
-              name="hotel_id"
-              className="form-input"
-              placeholder="Hotel ID"
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="date_of_birth" className="form-label">
-              Date of Birth
-            </label>
-            <input
-              type="date"
-              name="date_of_birth"
-              className="form-input"
-              placeholder="Date of Birth"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="phone"
-              className="form-input"
-              placeholder="Phone"
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              className="form-input"
-              placeholder="Email"
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="date_of_birth" className="form-label">
-              Date of Hire
-            </label>
-            <input
-              type="date"
-              name="hire_date"
-              className="form-input"
-              onChange={handleChange}
-              required
-            />
-            <button type="submit" className="form-button">
-              Add Staff
-            </button>
-            <button className="btn-close" onClick={handleDialog}>
-              x
-            </button>
-          </form>
-        </dialog>
+        <div className="dialog-overlay" onClick={() => handleDialog()}>
+          <dialog open className="full-page-dialog">
+            <form
+              className="add-staff-form"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="form-title">Add New Staff</h3>
+              <input
+                type="text"
+                name="staff_name"
+                className="form-input"
+                placeholder="First Name"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                name="staff_lastname"
+                className="form-input"
+                placeholder="Last Name"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                name="position"
+                className="form-input"
+                placeholder="Position"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                name="salary"
+                className="form-input"
+                placeholder="Salary"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                name="hotel_id"
+                className="form-input"
+                placeholder="Hotel ID"
+                onChange={handleChange}
+                required
+              />
+              <label htmlFor="date_of_birth" className="form-label">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                name="date_of_birth"
+                className="form-input"
+                placeholder="Date of Birth"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                name="phone"
+                className="form-input"
+                placeholder="Phone"
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                className="form-input"
+                placeholder="Email"
+                onChange={handleChange}
+                required
+              />
+              <label htmlFor="date_of_birth" className="form-label">
+                Date of Hire
+              </label>
+              <input
+                type="date"
+                name="hire_date"
+                className="form-input"
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="submit"
+                className="form-button"
+                onClick={handleSubmit}
+              >
+                Add Staff
+              </button>
+              <button className="btn-close" onClick={handleDialog}>
+                x
+              </button>
+            </form>
+          </dialog>
+        </div>
       )}
       <table className="data-table">
         <thead>
@@ -146,23 +239,24 @@ const AddStaffForm = () => {
             <th>Date of Birth</th>
             <th>Phone</th>
             <th>Email</th>
-            <th>Password</th>
             <th>Hire Date</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>John</td>
-            <td>Doe</td>
-            <td>Manager</td>
-            <td>60000</td>
-            <td>1</td>
-            <td>1990-01-01</td>
-            <td>02-123-5843</td>
-            <td>Jonh.doe@example.com</td>
-            <td>P@ssWord</td>
-            <td>2020-01-01</td>
-          </tr>
+          {listStaff.length > 0 &&
+            listStaff.map((staff) => (
+              <tr key={staff.staff_id}>
+                <td>{staff.staff_name}</td>
+                <td>{staff.staff_lastname}</td>
+                <td>{staff.position}</td>
+                <td>{staff.salary}</td>
+                <td>{staff.hotel_id}</td>
+                <td>{FormatDate(staff.date_of_birth)}</td>
+                <td>{staff.phone}</td>
+                <td>{staff.email}</td>
+                <td>{FormatDate(staff.hire_date)}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </>
