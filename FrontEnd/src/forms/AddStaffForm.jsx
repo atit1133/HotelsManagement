@@ -169,14 +169,14 @@ const AddStaffForm = () => {
                 onChange={handleChange}
                 required
               />
-              <input
+              {/* <input
                 type="number"
                 name="hotel_id"
                 className="form-input"
                 placeholder="Hotel ID"
                 onChange={handleChange}
                 required
-              />
+              /> */}
               <label htmlFor="date_of_birth" className="form-label">
                 Date of Birth
               </label>
@@ -185,6 +185,8 @@ const AddStaffForm = () => {
                 name="date_of_birth"
                 className="form-input"
                 placeholder="Date of Birth"
+                style={{ alignSelf: "flex-start" }}
+                defaultValue={new Date().toISOString().split("T")[0]}
                 onChange={handleChange}
                 required
               />
@@ -209,6 +211,8 @@ const AddStaffForm = () => {
               </label>
               <input
                 type="date"
+                style={{ alignSelf: "flex-start" }}
+                defaultValue={new Date().toISOString().split("T")[0]}
                 name="hire_date"
                 className="form-input"
                 onChange={handleChange}

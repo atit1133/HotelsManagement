@@ -50,7 +50,7 @@ router.post("/", (req, res) => {
 //Read all staff
 router.get("/:id", (req, res) => {
   const { id } = req.params;
-  const query = "SELECT * FROM staff where staff_id = ?";
+  const query = "SELECT * FROM staff where hotel_id = ?";
   pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);

@@ -1,5 +1,4 @@
 import { useState } from "react";
-// import axios from "axios";
 
 const AddGuestForm = () => {
   const [guest, setGuest] = useState({
@@ -18,22 +17,20 @@ const AddGuestForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // axios
-    //   .post("http://localhost:3001/guests", guest)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
   };
 
   return (
     <>
       <h1 style={{ textAlign: "center" }}>Guest Management</h1>
-      {/* <h2 style={{ textAlign: "center" }}>Add Guest</h2> */}
+
       <h3 style={{ textAlign: "left" }}>Guest Information</h3>
       <h4 style={{ textAlign: "left" }}>
         Please fill in the information below
       </h4>
-      <form onSubmit={handleSubmit} style={(styles.form, { width: "100%" })}>
-        {/* <h3 style={styles.heading}>Add New Guest</h3> */}
+      <form
+        onSubmit={handleSubmit}
+        style={(styles.form, { width: "60%", marginRight: "20px" })}
+      >
         <input
           type="text"
           name="first_name"
@@ -52,13 +49,10 @@ const AddGuestForm = () => {
         />
         <label
           style={{
-            alignSelf: "start",
-            marginBottom: "-20px",
-            zIndex: "1",
-            backgroundColor: "white",
-            padding: "0 5px",
-            borderRadius: "10px",
-            fontSize: "12px",
+            textAlign: "left",
+            width: "100%",
+            marginBottom: "5px",
+            color: "#333",
           }}
         >
           Date of Birth
@@ -68,8 +62,9 @@ const AddGuestForm = () => {
           name="date_of_birth"
           onChange={handleChange}
           onFocus={(e) => e.currentTarget.showPicker()}
+          defaultValue={new Date().toISOString().slice(0, 10)}
           required
-          style={styles.input}
+          style={{ display: "block", ...styles.input }}
         />
         <input
           type="text"
