@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "./AddStaffForm.css";
 import FormatDate from "../components/FormatDate";
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AddStaffForm = () => {
   const [listHotel, setListHotel] = useState([]);
   const [listStaff, setListStaff] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const [staff, setStaff] = useState({
     staff_name: "",
     staff_lastname: "",
@@ -31,50 +31,65 @@ const AddStaffForm = () => {
       return setListHotel({ error: error.message });
     }
   };
-  const fetchStaff = async (id) => {
-    const indicator = id ? id : "";
-
-    try {
-      const response = await fetch(`${apiUrl}/api/staff/${indicator}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.length === 0) {
-        setListStaff([]);
-        console.log("No staff data found.");
+  const fetchStaff = useCallback(
+    async (id) => {
+      const indicator = id ? id : "";
+      if (!indicator) {
         return [];
       }
 
-      setListStaff(data);
-      console.log("Staff data:", data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching staff data:", error);
-      setListStaff({ error: error.message });
-      return { error: error.message };
-    }
-  };
+      try {
+        const response = await fetch(`${apiUrl}/api/staff/${indicator}`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.length === 0) {
+          setListStaff([]);
+          console.log("No staff data found.");
+          return [];
+        }
+
+        setListStaff(data);
+        console.log("Staff data:", data);
+        return data;
+      } catch (error) {
+        console.error("Error fetching staff data:", error);
+        setListStaff({ error: error.message });
+        return { error: error.message };
+      }
+    },
+    [apiUrl]
+  );
 
   const fetchStaffByHotel = async () => {
     try {
+      const formatDate = (date) => {
+        const d = new Date(date);
+        const month = `${d.getMonth() + 1}`.padStart(2, "0");
+        const day = `${d.getDate()}`.padStart(2, "0");
+        const year = d.getFullYear();
+        return [year, month, day].join("-");
+      };
       const response = await fetch(`${apiUrl}/api/staff`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(staff),
+        body: JSON.stringify({
+          ...staff,
+          salary: Number(staff.salary),
+          date_of_birth: formatDate(staff.date_of_birth),
+          hire_date: formatDate(staff.hire_date),
+        }),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
       const data = await response.json();
-      console.log("Data:", data);
+      console.log("Staff data:", data);
+      const newStaff = { ...staff, staff_id: data.staff_id };
+      setListStaff((prev) => [...prev, newStaff]);
       return data;
     } catch (error) {
       console.error("Error adding staff:", error);
@@ -84,7 +99,7 @@ const AddStaffForm = () => {
 
   useEffect(() => {
     fetchHotel();
-  });
+  }, []);
 
   const handleChangeHotel = (e) => {
     const { value } = e.target;
@@ -101,10 +116,10 @@ const AddStaffForm = () => {
     setStaff({ ...staff, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsDialogOpen(false);
-    fetchStaffByHotel();
+    await fetchStaffByHotel();
   };
 
   return (
@@ -118,6 +133,7 @@ const AddStaffForm = () => {
         id="hotel_id"
         className="hotel-select"
         onChange={handleChangeHotel}
+        defaultValue={""}
       >
         <option value="" disabled>
           Select Hotel
@@ -169,14 +185,6 @@ const AddStaffForm = () => {
                 onChange={handleChange}
                 required
               />
-              {/* <input
-                type="number"
-                name="hotel_id"
-                className="form-input"
-                placeholder="Hotel ID"
-                onChange={handleChange}
-                required
-              /> */}
               <label htmlFor="date_of_birth" className="form-label">
                 Date of Birth
               </label>
@@ -185,6 +193,7 @@ const AddStaffForm = () => {
                 name="date_of_birth"
                 className="form-input"
                 placeholder="Date of Birth"
+                onFocus={(e) => e.currentTarget.showPicker()}
                 style={{ alignSelf: "flex-start" }}
                 defaultValue={new Date().toISOString().split("T")[0]}
                 onChange={handleChange}
@@ -212,6 +221,7 @@ const AddStaffForm = () => {
               <input
                 type="date"
                 style={{ alignSelf: "flex-start" }}
+                onFocus={(e) => e.currentTarget.showPicker()}
                 defaultValue={new Date().toISOString().split("T")[0]}
                 name="hire_date"
                 className="form-input"

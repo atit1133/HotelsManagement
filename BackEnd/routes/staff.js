@@ -41,7 +41,10 @@ router.post("/", (req, res) => {
           return res.status(500).send(err);
         }
         connection.release();
-        res.status(201).send("staff created successfully");
+        res.status(201).json({
+          message: "staff created successfully",
+          staff_id: result.insertId,
+        });
       }
     );
   });
