@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AddBookingForm.css"; // Import the CSS file
+import { CiSearch } from "react-icons/ci";
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AddBookingForm = ({ actions, sentBackData }) => {
   // actions = !actions;
-  const [booking, setBooking] = useState({
+
+  const bookingInitailState = {
     guest_id: "",
     room_number: "",
     checkin_date: "",
     checkout_date: "",
     total_price: "",
-  });
+  };
+  const [booking, setBooking] = useState(bookingInitailState);
+  const [listGuest, setListGuest] = useState();
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,19 +24,61 @@ const AddBookingForm = ({ actions, sentBackData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // axios
-    //   .post("http://localhost:3001/bookings", booking)
-    //   .then((response) => console.log(response))
-    //   .catch((error) => console.log(error));
   };
+
+  const fetchGuest = async () => {
+    const response = await fetch(`${apiUrl}/api/guest`);
+    const data = await response.json();
+    setListGuest(data);
+  };
+
+  useEffect(() => {
+    fetchGuest();
+  }, []);
 
   const handleBack = (e) => {
     e.preventDefault();
     sentBackData("Test Data");
   };
 
+  const handleSearch = () => {
+    setOpenDialog(true);
+  };
+
   return (
     <>
+      {openDialog && (
+        <dialog open style={{ zIndex: "9999" }}>
+          <div>
+            <h3>Search Data Guest</h3>
+            <form action="">
+              <label htmlFor="name">ชื่อลูกค้า</label>
+              <input type="text" name="name" />
+              <label htmlFor="idCard">เลขบัตรประชาชน</label>
+              <input type="number" name="idCard" />
+              <label htmlFor="phoneNumber">หมายเลขโทรศัพท์</label>
+              <input type="number" name="phoneNumber" />
+              <button type="submit">Search</button>
+            </form>
+          </div>
+          <div>
+            <table className="data-table">
+              <thead>
+                <th>id</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>หมายเลขโทรศัพท์</th>
+                <th>เลขบัตรประชาชน</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </dialog>
+      )}
       {actions ? (
         <div id="addBookingForm">
           <div style={{ width: "97%" }}>
@@ -38,14 +86,38 @@ const AddBookingForm = ({ actions, sentBackData }) => {
               <h3 className="form-heading">Add New Booking</h3>
               <div className="form-group">
                 <label htmlFor="guest_id">Guest ID:</label>
-                <input
-                  type="number"
-                  name="guest_id"
-                  placeholder="Guest ID"
-                  value={booking.guest_id}
-                  onChange={handleChange}
-                  required
-                />
+                <div
+                  style={{
+                    position: "relative",
+                    height: "30px",
+                    marginTop: "10px",
+                  }}
+                >
+                  <CiSearch
+                    onClick={handleSearch}
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      position: "absolute",
+                      top: "0px",
+                      left: "0px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  <input
+                    style={{
+                      position: "absolute",
+                      top: "0px",
+                      left: "40px", // Adjust the left position to avoid overlap
+                    }}
+                    type="number"
+                    name="guest_id"
+                    placeholder="Guest ID"
+                    value={booking.guest_id}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="room_number">Room Number:</label>

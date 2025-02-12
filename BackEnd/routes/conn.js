@@ -3,7 +3,8 @@ const mysql = require("mysql2");
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "mysqldocker",
+  // password: "mysqldocker",
+  password: "keep1234",
   database: "hotel_management",
   port: 3306,
   multipleStatements: true,

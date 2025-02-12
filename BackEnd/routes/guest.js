@@ -19,10 +19,12 @@ router.post("/", (req, res) => {
       [first_name, last_name, date_of_birth, address, phone, email],
       (err, result) => {
         if (err) {
-          return res.status(500).send(err);
+          return res.status(500).json(err);
         }
         connection.release();
-        res.status(201).send("guest created successfully");
+        res
+          .status(201)
+          .json({ guest_id: result.insertId, message: "Created new " });
       }
     );
   });
@@ -39,6 +41,22 @@ router.get("/:id", (req, res) => {
     connection.query(query, [id], (err, result) => {
       if (result.length === 0) {
         return res.status(404).send("The data table is empty.");
+      }
+      connection.release();
+      res.status(200).json(result);
+    });
+  });
+});
+
+router.get("/", (req, res) => {
+  const query = "SELECT * FROM guest";
+  pool.getConnection((err, connection) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    connection.query(query, (err, result) => {
+      if (result.length === 0) {
+        return res.status(404).json({ message: "The data table is empty." });
       }
       connection.release();
       res.status(200).json(result);
@@ -84,7 +102,7 @@ router.delete("/:id", (req, res) => {
         return res.status(500).send(err);
       }
       connection.release();
-      res.status(200).send("guest deleted successfully");
+      res.status(200).json({ message: "guest deleted successfully" });
     });
   });
 });

@@ -6,7 +6,8 @@ const path = require("path");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "mysqldocker",
+  // password: "mysqldocker",
+  password: "keep1234",
   multipleStatements: true, // Enable multiple statements to execute the SQL script
 });
 

@@ -1,14 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import FormatDate from "../components/FormatDate";
+
+const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AddGuestForm = () => {
-  const [guest, setGuest] = useState({
+  const initailState = {
     first_name: "",
     last_name: "",
     date_of_birth: "",
     address: "",
     phone: "",
     email: "",
-  });
+    guest_id: "",
+  };
+  const [guest, setGuest] = useState(initailState);
+
+  const [listGuest, setListGuest] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,7 +24,63 @@ const AddGuestForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    fetchAddGuest();
   };
+
+  const fetchAddGuest = async () => {
+    const response = await fetch(`${apiUrl}/api/guest`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(guest),
+    });
+    const data = await response.json();
+
+    const newGust = {
+      ...guest,
+      guest_id: data.guest_id,
+    };
+    setListGuest((prev) => [...prev, newGust]);
+    setGuest(initailState);
+    return data;
+  };
+
+  const fetchGuest = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/guest/`);
+      if (response.status === 404) {
+        console.log(response.message);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (!data || Object.keys(data).length === 0) {
+        console.warn("No data returned from the API");
+        setGuest({ first_name: "Guest", email: "No data avilable" });
+      } else {
+        setListGuest(data);
+      }
+    } catch (error) {
+      console.error("Error fetching guest data:", error);
+    }
+  };
+
+  const fetchDeleteGuest = async (id) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/guest/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      setListGuest((prev) => prev.filter((guests) => guests.guest_id !== id));
+      return data;
+    } catch (error) {
+      throw new Error("Http error an : " + error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchGuest();
+  }, []);
 
   return (
     <>
@@ -34,6 +97,7 @@ const AddGuestForm = () => {
         <input
           type="text"
           name="first_name"
+          value={guest.first_name}
           placeholder="First Name"
           onChange={handleChange}
           required
@@ -42,6 +106,7 @@ const AddGuestForm = () => {
         <input
           type="text"
           name="last_name"
+          value={guest.last_name}
           placeholder="Last Name"
           onChange={handleChange}
           required
@@ -60,15 +125,16 @@ const AddGuestForm = () => {
         <input
           type="date"
           name="date_of_birth"
+          value={guest.date_of_birth}
           onChange={handleChange}
           onFocus={(e) => e.currentTarget.showPicker()}
-          defaultValue={new Date().toISOString().slice(0, 10)}
           required
           style={{ display: "block", ...styles.input }}
         />
         <input
           type="text"
           name="address"
+          value={guest.address}
           placeholder="Address"
           onChange={handleChange}
           required
@@ -77,6 +143,7 @@ const AddGuestForm = () => {
         <input
           type="text"
           name="phone"
+          value={guest.phone}
           placeholder="Phone"
           onChange={handleChange}
           required
@@ -85,6 +152,7 @@ const AddGuestForm = () => {
         <input
           type="email"
           name="email"
+          value={guest.email}
           placeholder="Email"
           onChange={handleChange}
           required
@@ -108,15 +176,22 @@ const AddGuestForm = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>John</td>
-            <td>Doe</td>
-            <td>01/01/1990</td>
-            <td>123 Main St</td>
-            <td>123-456-7890</td>
-            <td>John@example.com</td>
-            <td>Edit/Delete</td>
-          </tr>
+          {listGuest &&
+            listGuest.map((res) => (
+              <tr key={res.guest_id}>
+                <td>{res.first_name}</td>
+                <td>{res.last_name}</td>
+                <td>{FormatDate(res.date_of_birth)}</td>
+                <td>{res.address}</td>
+                <td>{res.phone}</td>
+                <td>{res.email}</td>
+                <td>
+                  <button onClick={() => fetchDeleteGuest(res.guest_id)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </>
