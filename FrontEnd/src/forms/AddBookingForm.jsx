@@ -16,10 +16,34 @@ const AddBookingForm = ({ actions, sentBackData }) => {
   const [booking, setBooking] = useState(bookingInitailState);
   const [listGuest, setListGuest] = useState();
   const [openDialog, setOpenDialog] = useState(false);
+  const [searchList, setSearchList] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setBooking({ ...booking, [name]: value });
+  };
+
+  const handleSearchType = (e) => {
+    const { name, value } = e.target;
+
+    // Update the searchList state
+    setSearchList((prevSearchList) => ({ ...prevSearchList, [name]: value }));
+
+    // Filter the members based on the search criteria
+    setListGuest((members) =>
+      members.filter((guest) => {
+        if (name === "first_name") {
+          return guest.first_name && guest.first_name.includes(value);
+        } else if (name === "id_card") {
+          return guest.id_card && guest.id_card.includes(value);
+        } else if (name === "phone") {
+          return guest.phone && guest.phone.includes(value);
+        } else {
+          return false;
+        }
+      })
+    );
+    console.log(listGuest);
   };
 
   const handleSubmit = (e) => {
@@ -30,6 +54,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
     const response = await fetch(`${apiUrl}/api/guest`);
     const data = await response.json();
     setListGuest(data);
+    setSearchList(data);
   };
 
   useEffect(() => {
@@ -43,6 +68,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
 
   const handleSearch = () => {
     setOpenDialog(true);
+    console.log(listGuest);
   };
 
   return (
@@ -52,13 +78,19 @@ const AddBookingForm = ({ actions, sentBackData }) => {
           <div>
             <h3>Search Data Guest</h3>
             <form action="">
-              <label htmlFor="name">ชื่อลูกค้า</label>
-              <input type="text" name="name" />
-              <label htmlFor="idCard">เลขบัตรประชาชน</label>
-              <input type="number" name="idCard" />
-              <label htmlFor="phoneNumber">หมายเลขโทรศัพท์</label>
-              <input type="number" name="phoneNumber" />
-              <button type="submit">Search</button>
+              <label htmlFor="first_name">ชื่อลูกค้า</label>
+              <input
+                type="text"
+                name="first_name"
+                onChange={handleSearchType}
+              />
+              <label htmlFor="id_card">เลขบัตรประชาชน</label>
+              <input type="number" name="id_card" onChange={handleSearchType} />
+              <label htmlFor="phone">หมายเลขโทรศัพท์</label>
+              <input type="number" name="phone" onChange={handleSearchType} />
+              {/* <button type="button" onClick={filterSearchData}>
+                Search
+              </button> */}
             </form>
           </div>
           <div>
@@ -71,9 +103,16 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                 <th>เลขบัตรประชาชน</th>
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                </tr>
+                {listGuest.map((data) => (
+                  <tr>
+                    <td>{data.guest_id}</td>
+                    <td>{data.first_name}</td>
+                    <td>{data.last_name}</td>
+                    <td>{data.phone}</td>
+                    <td>{data.id_card}</td>
+                  </tr>
+                ))}
+                <td>1</td>
               </tbody>
             </table>
           </div>

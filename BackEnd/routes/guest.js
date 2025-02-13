@@ -4,10 +4,27 @@ const pool = require("./conn");
 
 // Create a new guest
 router.post("/", (req, res) => {
-  const { first_name, last_name, date_of_birth, address, phone, email } =
-    req.body;
+  const {
+    first_name,
+    last_name,
+    date_of_birth,
+    address,
+    phone,
+    email,
+    id_card,
+  } = req.body;
+  console.log(
+    "Recieve Data: ",
+    first_name,
+    last_name,
+    date_of_birth,
+    address,
+    phone,
+    email,
+    id_card
+  );
   const query =
-    "INSERT INTO guest (first_name,last_name, date_of_birth, address, phone, email) VALUES (?, ?, ?, ?, ?, ?)";
+    "INSERT INTO guest (first_name,last_name, date_of_birth, address, phone, email, id_card) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
   //Get a connection from the pool
   pool.getConnection((err, connection) => {
@@ -16,7 +33,7 @@ router.post("/", (req, res) => {
     }
     connection.query(
       query,
-      [first_name, last_name, date_of_birth, address, phone, email],
+      [first_name, last_name, date_of_birth, address, phone, email, id_card],
       (err, result) => {
         if (err) {
           return res.status(500).json(err);

@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `hotel_management`.`guest` (
     `address` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(15) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
+    `id_card` INT NOT NULL,
     PRIMARY KEY (`guest_id`)
 ) ENGINE = InnoDB;
 

@@ -12,6 +12,7 @@ const AddGuestForm = () => {
     phone: "",
     email: "",
     guest_id: "",
+    id_card: "",
   };
   const [guest, setGuest] = useState(initailState);
 
@@ -28,6 +29,7 @@ const AddGuestForm = () => {
   };
 
   const fetchAddGuest = async () => {
+    console.log(guest.id_card);
     const response = await fetch(`${apiUrl}/api/guest`, {
       method: "POST",
       headers: {
@@ -78,6 +80,8 @@ const AddGuestForm = () => {
     }
   };
 
+  const formatID = (input) => {};
+
   useEffect(() => {
     fetchGuest();
   }, []);
@@ -94,6 +98,15 @@ const AddGuestForm = () => {
         onSubmit={handleSubmit}
         style={(styles.form, { width: "60%", marginRight: "20px" })}
       >
+        <input
+          type="number"
+          name="id_card"
+          value={guest.id_card}
+          placeholder="ID Card No."
+          onChange={handleChange}
+          required
+          style={styles.input}
+        />
         <input
           type="text"
           name="first_name"
