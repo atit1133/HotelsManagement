@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import "./AddBookingForm.css"; // Import the CSS file
+import "./AddBookingForm.css";
 import { CiSearch } from "react-icons/ci";
+import { TbHomePlus } from "react-icons/tb";
+import { HiOutlineCalendarDateRange } from "react-icons/hi2";
+import { IoPricetagsOutline } from "react-icons/io5";
+import SearchRoom from "../components/SearchRoom";
+
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 const AddBookingForm = ({ actions, sentBackData }) => {
-  // actions = !actions;
-
   const bookingInitailState = {
     guest_id: "",
     room_number: "",
@@ -17,6 +20,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
   const [listGuest, setListGuest] = useState();
   const [openDialog, setOpenDialog] = useState(false);
   const [searchList, setSearchList] = useState();
+  const [openDialogRoom, setOpenDialogRoom] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,25 +29,16 @@ const AddBookingForm = ({ actions, sentBackData }) => {
 
   const handleSearchType = (e) => {
     const { name, value } = e.target;
-
-    // Update the searchList state
-    setSearchList((prevSearchList) => ({ ...prevSearchList, [name]: value }));
-
-    // Filter the members based on the search criteria
-    setListGuest((members) =>
-      members.filter((guest) => {
-        if (name === "first_name") {
-          return guest.first_name && guest.first_name.includes(value);
-        } else if (name === "id_card") {
-          return guest.id_card && guest.id_card.includes(value);
-        } else if (name === "phone") {
-          return guest.phone && guest.phone.includes(value);
-        } else {
-          return false;
-        }
-      })
-    );
-    console.log(listGuest);
+    const searchData = listGuest.filter((members) => {
+      if (name === "first_name") {
+        return members.first_name && members.first_name.includes(value);
+      } else if (name === "phone") {
+        return members.phone && members.phone.includes(value);
+      } else if (name === "id_card") {
+        return members.id_card && members.id_card.includes(value);
+      }
+    });
+    setSearchList(searchData);
   };
 
   const handleSubmit = (e) => {
@@ -67,15 +62,31 @@ const AddBookingForm = ({ actions, sentBackData }) => {
   };
 
   const handleSearch = () => {
-    setOpenDialog(true);
-    console.log(listGuest);
+    setOpenDialog(!openDialog);
+  };
+
+  const openDialogRooms = () => {
+    setOpenDialogRoom(!openDialogRoom);
+    console.log(openDialogRoom);
   };
 
   return (
     <>
-      {openDialog && (
+      {openDialogRoom && (
         <dialog open style={{ zIndex: "9999" }}>
-          <div>
+          <SearchRoom />
+        </dialog>
+      )}
+      {openDialog && (
+        <dialog
+          open
+          style={{
+            zIndex: "9999",
+            height: "80vh",
+            borderRadius: "10px",
+          }}
+        >
+          <div style={{ position: "relative" }}>
             <h3>Search Data Guest</h3>
             <form action="">
               <label htmlFor="first_name">ชื่อลูกค้า</label>
@@ -88,14 +99,18 @@ const AddBookingForm = ({ actions, sentBackData }) => {
               <input type="number" name="id_card" onChange={handleSearchType} />
               <label htmlFor="phone">หมายเลขโทรศัพท์</label>
               <input type="number" name="phone" onChange={handleSearchType} />
-              {/* <button type="button" onClick={filterSearchData}>
-                Search
-              </button> */}
             </form>
           </div>
-          <div>
-            <table className="data-table">
-              <thead>
+          <div style={{ overflowY: "auto", height: "70vh" }}>
+            <table className="data-table" style={{}}>
+              <thead
+                style={{
+                  position: "sticky",
+                  top: "-20px",
+                  background: "white",
+                  zIndex: "1",
+                }}
+              >
                 <th>id</th>
                 <th>ชื่อ</th>
                 <th>นามสกุล</th>
@@ -103,7 +118,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                 <th>เลขบัตรประชาชน</th>
               </thead>
               <tbody>
-                {listGuest.map((data) => (
+                {searchList.map((data) => (
                   <tr>
                     <td>{data.guest_id}</td>
                     <td>{data.first_name}</td>
@@ -112,9 +127,19 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                     <td>{data.id_card}</td>
                   </tr>
                 ))}
-                <td>1</td>
               </tbody>
             </table>
+            <p
+              style={{
+                position: "absolute",
+                top: "-10px",
+                right: "10px",
+                cursor: "pointer",
+              }}
+              onClick={handleSearch}
+            >
+              x
+            </p>
           </div>
         </dialog>
       )}
@@ -127,9 +152,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                 <label htmlFor="guest_id">Guest ID:</label>
                 <div
                   style={{
-                    position: "relative",
-                    height: "30px",
-                    marginTop: "10px",
+                    display: "flex",
                   }}
                 >
                   <CiSearch
@@ -137,17 +160,12 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                     style={{
                       width: "30px",
                       height: "30px",
-                      position: "absolute",
-                      top: "0px",
-                      left: "0px",
                       cursor: "pointer",
                     }}
                   />
                   <input
                     style={{
-                      position: "absolute",
-                      top: "0px",
-                      left: "40px", // Adjust the left position to avoid overlap
+                      marginLeft: "12px",
                     }}
                     type="number"
                     name="guest_id"
@@ -160,45 +178,91 @@ const AddBookingForm = ({ actions, sentBackData }) => {
               </div>
               <div className="form-group">
                 <label htmlFor="room_number">Room Number:</label>
-                <input
-                  type="number"
-                  name="room_number"
-                  placeholder="Room Number"
-                  value={booking.room_number}
-                  onChange={handleChange}
-                  required
-                />
+                <div
+                  style={{
+                    display: "flex",
+                  }}
+                >
+                  <TbHomePlus
+                    onClick={openDialogRooms}
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  <input
+                    style={{
+                      marginLeft: "12px",
+                    }}
+                    type="number"
+                    name="room_number"
+                    placeholder="Room Number"
+                    value={booking.room_number}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="checkin_date">Check-in Date:</label>
-                <input
-                  type="date"
-                  name="checkin_date"
-                  value={booking.checkin_date}
-                  onChange={handleChange}
-                  required
-                />
+                <div style={{ display: "flex" }}>
+                  <HiOutlineCalendarDateRange
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  <input
+                    style={{ marginLeft: "12px" }}
+                    type="date"
+                    name="checkin_date"
+                    value={booking.checkin_date}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="checkout_date">Check-out Date:</label>
-                <input
-                  type="date"
-                  name="checkout_date"
-                  value={booking.checkout_date}
-                  onChange={handleChange}
-                  required
-                />
+                <div style={{ display: "flex" }}>
+                  <HiOutlineCalendarDateRange
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      cursor: "pointer",
+                    }}
+                  />
+                  <input
+                    style={{ marginLeft: "12px" }}
+                    type="date"
+                    name="checkout_date"
+                    value={booking.checkout_date}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
               <div className="form-group">
                 <label htmlFor="total_price">Total Price:</label>
-                <input
-                  type="number"
-                  name="total_price"
-                  placeholder="Total Price"
-                  value={booking.total_price}
-                  onChange={handleChange}
-                  required
-                />
+                <div style={{ display: "flex" }}>
+                  <IoPricetagsOutline
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                    }}
+                  />
+                  <input
+                    style={{ marginLeft: "12px" }}
+                    type="number"
+                    name="total_price"
+                    placeholder="Total Price"
+                    value={booking.total_price}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
               <button
                 type="submit"
