@@ -1,59 +1,48 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
+import { IoAdd } from "react-icons/io5";
 
 const SearchRoom = () => {
   const [listHotels, setListHotels] = useState();
   const [listRoomType, setListRoomType] = useState();
-
   const fetchHotels = async () => {
     const response = await fetch(`${apiUrl}/api/hotels`);
     const data = await response.json();
     setListHotels(data);
-    console.log(data);
   };
-
   const searchRoomType = async (id) => {
-    const response = await fetch(`${apiUrl}/api/roomtype/${id}`);
+    console.log(id);
+    const response = await fetch(`${apiUrl}/api/rooms/${id}`);
     const data = await response.json();
     setListRoomType(data);
-    console.log(data);
+    console.log(listRoomType);
   };
-
   useEffect(() => {
     fetchHotels();
   }, []);
 
-  const handleClickRoom = () => {
-    const { hotel_id } = listHotels;
-    console.log(hotel_id);
-    searchRoomType(listHotels.hotel_id);
-  };
-
-  const handleSelectHotel = (e) => {
-    setListRoomType((prev) => [...prev, { idhotel: e.target.value }]);
-  };
   return (
     <div>
       <form>
         <label htmlFor="hotels">เลือกโรงแรม Booking</label>
-        <select name="hotels" id="" onClick={handleSelectHotel}>
-          <option value="">เลือก</option>
-
+        <select
+          name="hotels"
+          id=""
+          onChange={(e) => {
+            const id = e.target.value;
+            searchRoomType(id);
+          }}
+        >
+          <option value="" disabled>
+            เลือก
+          </option>
           {listHotels &&
             listHotels.map((res) => (
-              <option value={res.hotel_id}>{res.hotel_name}</option>
+              <option key={res.hotel_id} value={res.hotel_id}>
+                {res.hotel_name}
+              </option>
             ))}
         </select>
-        <label htmlFor="roomType">เลือกห้องพักและราคา</label>
-        <select name="roomType" id="" onClick={handleClickRoom}>
-          <option value="">เลือก</option>
-          {listRoomType &&
-            listRoomType.map((res) => (
-              <option value={res.hotel_id}>{res.hotel_name}</option>
-            ))}
-        </select>
-
-        <button>ค้นหา</button>
       </form>
       <hr />
       <table className="data-table">
@@ -66,16 +55,24 @@ const SearchRoom = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>2</td>
-            <td>350</td>
-            <td>select</td>
-          </tr>
+          {listRoomType &&
+            listRoomType.map((data) => (
+              <tr key={data.room_no}>
+                <td>{data.room_no}</td>
+                <td>{data.capacity}</td>
+                <td>{data.price_per_night}</td>
+                <td
+                  style={{
+                    textAlign: "center",
+                  }}
+                >
+                  {<IoAdd style={{ cursor: "pointer" }} />}
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>
   );
 };
-
 export default SearchRoom;

@@ -21,6 +21,7 @@ const AddRoomForm = ({ btnClose, currentHotel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(room);
     const updateRoom = { ...room, hotel_id: currentHotel };
 
     try {

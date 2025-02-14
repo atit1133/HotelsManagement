@@ -4,22 +4,27 @@ const pool = require("./conn");
 
 // Create a new room
 router.post("/", (req, res) => {
-  const { hotel_id, type_id, status } = req.body;
-  console.log("Received values:", { hotel_id, type_id, status });
-  const query = "INSERT INTO room (hotel_id, type_id, status) VALUES (?, ?, ?)";
+  const { hotel_id, type_id, status, room_no } = req.body;
+  console.log("Received values:", { hotel_id, type_id, status, room_no });
+  const query =
+    "INSERT INTO room (hotel_id, type_id, status, room_no) VALUES (?, ?, ?, ?)";
 
   //Get a connection from the pool
   pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);
     }
-    connection.query(query, [hotel_id, type_id, status], (err, result) => {
-      if (err) {
-        return res.status(500).send(err);
+    connection.query(
+      query,
+      [hotel_id, type_id, status, room_no],
+      (err, result) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        connection.release();
+        res.status(201).send("Room created successfully");
       }
-      connection.release();
-      res.status(201).send("Room created successfully");
-    });
+    );
   });
 });
 
@@ -27,7 +32,7 @@ router.post("/", (req, res) => {
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   const query =
-    "SELECT room_type.name, room.status, room.room_id FROM room INNER JOIN hotel ON room.hotel_id = hotel.hotel_id INNER JOIN room_type ON room.type_id = room_type.type_id WHERE hotel.hotel_id = ?";
+    "SELECT room_type.name, room_type.price_per_night , room_type.capacity ,room.room_no, room.status, room.room_id FROM room INNER JOIN hotel ON room.hotel_id = hotel.hotel_id INNER JOIN room_type ON room.type_id = room_type.type_id WHERE hotel.hotel_id = ?";
   pool.getConnection((err, connection) => {
     if (err) {
       return res.status(500).send(err);

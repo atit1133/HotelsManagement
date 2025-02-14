@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `hotel_management`.`staff` (
 CREATE TABLE IF NOT EXISTS `hotel_management`.`room` (
     `room_id` INT NOT NULL AUTO_INCREMENT,
     `hotel_id` INT NOT NULL,
+    `room_no` INT NOT NULL,
     `type_id` INT NOT NULL,
     `status` VARCHAR(20) NOT NULL,
     PRIMARY KEY (`room_id`),
