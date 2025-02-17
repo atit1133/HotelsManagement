@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 import { IoAdd } from "react-icons/io5";
 
-const SearchRoom = () => {
+const SearchRoom = ({ handleForm }) => {
   const [listHotels, setListHotels] = useState();
   const [listRoomType, setListRoomType] = useState();
+
+  //Searching Hotel_name by default
   const fetchHotels = async () => {
     const response = await fetch(`${apiUrl}/api/hotels`);
     const data = await response.json();
     setListHotels(data);
   };
+
+  //Searching Avialable Room by hotel id
   const searchRoomType = async (id) => {
     console.log(id);
     const response = await fetch(`${apiUrl}/api/rooms/${id}`);
@@ -19,6 +23,8 @@ const SearchRoom = () => {
   };
   useEffect(() => {
     fetchHotels();
+    searchRoomType("1");
+    // handleForm("test Room Reservation", 100);
   }, []);
 
   return (
@@ -66,7 +72,14 @@ const SearchRoom = () => {
                     textAlign: "center",
                   }}
                 >
-                  {<IoAdd style={{ cursor: "pointer" }} />}
+                  {
+                    <IoAdd
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        handleForm(data.room_no, data.price_per_night, null)
+                      }
+                    />
+                  }
                 </td>
               </tr>
             ))}

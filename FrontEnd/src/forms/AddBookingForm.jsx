@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./AddBookingForm.css";
 import { CiSearch } from "react-icons/ci";
 import { TbHomePlus } from "react-icons/tb";
@@ -21,6 +21,9 @@ const AddBookingForm = ({ actions, sentBackData }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [searchList, setSearchList] = useState();
   const [openDialogRoom, setOpenDialogRoom] = useState(false);
+  const checkin_date_picker = useRef(null);
+  const checkout_date_picker = useRef(null);
+  const [listBooking, setListBooking] = useState();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,6 +57,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
 
   useEffect(() => {
     fetchGuest();
+    FetchBookingListh();
   }, []);
 
   const handleBack = (e) => {
@@ -70,11 +74,42 @@ const AddBookingForm = ({ actions, sentBackData }) => {
     console.log(openDialogRoom);
   };
 
+  const handleForm = (reserv, price, guestId) => {
+    console.log(reserv);
+    setBooking((prev) => ({
+      ...prev, // Spread the previous state to maintain other properties
+      ...(reserv && { room_number: reserv }), // Conditionally update room_number
+      ...(price && { total_price: price }), // Conditionally update total_price
+      ...(guestId && { guest_id: guestId }), // Conditionally update guest_id
+    }));
+
+    setOpenDialogRoom(false);
+    setOpenDialog(false);
+  };
+
+  const saveBooking = async () => {
+    const response = await fetch(`${apiUrl}/api/booking`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(booking),
+    });
+    console.log("saveData");
+    FetchBookingListh();
+  };
+
+  const FetchBookingListh = async () => {
+    const response = await fetch(`${apiUrl}/api/booking`);
+    const data = await response.json();
+    setListBooking(data);
+  };
+
   return (
     <>
       {openDialogRoom && (
         <dialog open style={{ zIndex: "9999" }}>
-          <SearchRoom />
+          <SearchRoom handleForm={handleForm} />
         </dialog>
       )}
       {openDialog && (
@@ -88,6 +123,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
         >
           <div style={{ position: "relative" }}>
             <h3>Search Data Guest</h3>
+
             <form action="">
               <label htmlFor="first_name">ชื่อลูกค้า</label>
               <input
@@ -102,7 +138,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
             </form>
           </div>
           <div style={{ overflowY: "auto", height: "70vh" }}>
-            <table className="data-table" style={{}}>
+            <table className="data-table">
               <thead
                 style={{
                   position: "sticky",
@@ -119,7 +155,10 @@ const AddBookingForm = ({ actions, sentBackData }) => {
               </thead>
               <tbody>
                 {searchList.map((data) => (
-                  <tr>
+                  <tr
+                    key={data.guest_id}
+                    onClick={() => handleForm(null, null, data.guest_id)}
+                  >
                     <td>{data.guest_id}</td>
                     <td>{data.first_name}</td>
                     <td>{data.last_name}</td>
@@ -147,7 +186,9 @@ const AddBookingForm = ({ actions, sentBackData }) => {
         <div id="addBookingForm">
           <div style={{ width: "97%" }}>
             <form onSubmit={handleSubmit} className="booking-form">
-              <h3 className="form-heading">Add New Booking</h3>
+              <h3 className="form-heading">
+                Add New Booking{console.log(booking)}
+              </h3>
               <div className="form-group">
                 <label htmlFor="guest_id">Guest ID:</label>
                 <div
@@ -213,13 +254,19 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                       height: "30px",
                       cursor: "pointer",
                     }}
+                    onClick={() =>
+                      checkin_date_picker.current &&
+                      checkin_date_picker.current.showPicker()
+                    }
                   />
                   <input
                     style={{ marginLeft: "12px" }}
                     type="date"
+                    ref={checkin_date_picker}
                     name="checkin_date"
                     value={booking.checkin_date}
                     onChange={handleChange}
+                    onFocus={(e) => e.currentTarget.showPicker()}
                     required
                   />
                 </div>
@@ -233,13 +280,16 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                       height: "30px",
                       cursor: "pointer",
                     }}
+                    onClick={() => checkout_date_picker.current.showPicker()}
                   />
                   <input
+                    ref={checkout_date_picker}
                     style={{ marginLeft: "12px" }}
                     type="date"
                     name="checkout_date"
                     value={booking.checkout_date}
                     onChange={handleChange}
+                    onFocus={(e) => e.currentTarget.showPicker()}
                     required
                   />
                 </div>
@@ -268,6 +318,7 @@ const AddBookingForm = ({ actions, sentBackData }) => {
                 type="submit"
                 className="submit-button"
                 style={{ alignSelf: "start" }}
+                onClick={saveBooking}
               >
                 Add Booking
               </button>
@@ -289,30 +340,33 @@ const AddBookingForm = ({ actions, sentBackData }) => {
           </tr>
         </thead>
         <tbody>
-          <tr onClick={handleBack}>
-            <td>1</td>
-            <td>101</td>
-            <td>2021-08-01</td>
-            <td>2021-08-05</td>
-            <td>5000</td>
-            {actions == "booking" ? (
-              <td>
-                <button>Edit</button>
-                <button>Delete</button>
-              </td>
-            ) : (
-              <td>
-                <select name="status" id="" defaultValue="">
-                  <option value="" disabled>
-                    Select a status
-                  </option>
-                  <option value="checkin">Check-in</option>
-                  <option value="checkin">Check-out</option>
-                  <option value="checkin">Confirmed</option>
-                </select>
-              </td>
-            )}
-          </tr>
+          {listBooking &&
+            listBooking.map((data) => (
+              <tr key={data.booking_id}>
+                <td>{data.guest_id}</td>
+                <td>{data.room_number}</td>
+                <td>{data.checkin_date}</td>
+                <td>{data.checkout_date}</td>
+                <td>{data.total_price}</td>
+                {actions == "booking" ? (
+                  <td>
+                    <button>Edit</button>
+                    <button>Delete</button>
+                  </td>
+                ) : (
+                  <td>
+                    <select name="status" id="" defaultValue="">
+                      <option value="" disabled>
+                        Select a status
+                      </option>
+                      <option value="checkin">Check-in</option>
+                      <option value="checkin">Check-out</option>
+                      <option value="checkin">Confirmed</option>
+                    </select>
+                  </td>
+                )}
+              </tr>
+            ))}
         </tbody>
       </table>
     </>

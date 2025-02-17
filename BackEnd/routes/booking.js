@@ -29,6 +29,22 @@ router.post("/", (req, res) => {
 });
 
 //Read all booking
+router.get("/", (req, res) => {
+  const query = "SELECT * FROM booking";
+  pool.getConnection((err, connection) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    connection.query(query, (err, result) => {
+      if (result.length === 0) {
+        return res.status(404).send("The data table is empty.");
+      }
+      connection.release();
+      res.status(200).json(result);
+    });
+  });
+});
+
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   const query = "SELECT * FROM booking where booking_id = ?";
